@@ -1,7 +1,8 @@
-import {Body, Controller, Delete, Get, Param, Post} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Post, Put} from '@nestjs/common';
 import {TodosService} from "./todos.service";
 import {TodosInterface} from "../interface/Todos.interface";
 import {TodoDTO} from "../dto/todoDTO";
+import {Todo} from "../entity/todo.entity";
 
 @Controller('todos')
 export class TodosController {
@@ -14,25 +15,13 @@ export class TodosController {
     }
 
     @Get(':id')
-    async findOne(@Param('id') id): Promise<{ description: string; id: number; message: string; title: string } | string> {
-        return await this.todos.findOneBy(id).then(value => value.id === 5 ?
-            {
-                message: '5 c\'est bien',
-                id: value.id,
-                description: value.description,
-                title: value.title
-            }
-            : {
-                message: 'pas 5 c\'est pas bien',
-                id: value.id,
-                description: value.description,
-                title: value.title
-            }).catch(() =>{ return 'desole pas bien'});
+    async findOne(@Param('id') id): Promise<Todo | null | string> {
+        return await this.todos.findOneBy(id).catch(() =>{ return 'desole pas bien'});
     }
 
     @Delete(':id')
     async remove(@Param('id') id): Promise<string> {
-        await this.todos.delete(id);
+        await this.todos.delete(id).catch(reason => reason);
         return 'ok'
     }
 
@@ -40,4 +29,9 @@ export class TodosController {
     async create(@Body() todo: TodoDTO) {
         await this.todos.create(todo)
     }
+    @Put()
+    async update(@Body() todo: TodoDTO) {
+        await this.todos.update(todo);
+    }
+
 }

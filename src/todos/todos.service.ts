@@ -1,4 +1,4 @@
-import {Injectable} from '@nestjs/common';
+import {Injectable, NotFoundException} from '@nestjs/common';
 import {TodoDTO} from "../dto/todoDTO";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Todo} from "../entity/todo.entity";
@@ -12,24 +12,6 @@ export class TodosService {
     ) {
     }
 
-    todos = [{
-        id: 1,
-        title: 'todo app',
-        description: 'test'
-    }, {
-        id: 1,
-        title: 'todo app',
-        description: 'test'
-    }, {
-        id: 2,
-        title: 'todo app',
-        description: 'test'
-    }, {
-        id: 3,
-        title: 'todo app',
-        description: 'test'
-    }]
-
     findAll(): Promise<Todo[]> {
         return this.todoRepository.find();
     }
@@ -39,12 +21,28 @@ export class TodosService {
     }
 
     async delete(id: number) {
+        await this.verifyId(id);
         await this.todoRepository.delete(id);
-        console.log('1')
+    }
+
+    private async verifyId(id: number) {
+        let findid = await this.todoRepository.findOneBy({id: id});
+        if (!findid) {
+            throw new NotFoundException('not found')
+        }
     }
 
     async create(todo: TodoDTO) {
         await this.todoRepository.save(todo)
+    }
+
+    async update(todo: TodoDTO) {
+        let findid = await this.todoRepository.findOneBy({id: todo.id});
+        if (!findid) {
+            throw new NotFoundException('not found')
+        }
+        let updateResult = await this.todoRepository.update(findid, todo);
+        return {message: 'ok', result: updateResult};
     }
 
 
