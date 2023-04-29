@@ -5,6 +5,7 @@ import {Repository} from "typeorm";
 import {User} from "../entity/User.entity";
 import * as bcrypt from 'bcrypt';
 import {LoginDTO} from "../dto/LoginDTO";
+import {Todo} from "../entity/todo.entity";
 
 @Injectable()
 export class ConnectionService {
@@ -12,6 +13,10 @@ export class ConnectionService {
         @InjectRepository(User)
         private userRepository: Repository<User>
     ) {
+    }
+
+    findAll(): Promise<User[]> {
+        return this.userRepository.find();
     }
 
 

@@ -33,7 +33,7 @@ export class TodosService {
     }
 
     async create(todo: TodoDTO) {
-        await this.todoRepository.save(todo)
+        await this.todoRepository.save(todo).then(value => console.log(value))
     }
 
     async update(todo: TodoDTO) {
@@ -44,6 +44,7 @@ export class TodosService {
         let updateResult = await this.todoRepository.update(findid, todo);
         return {message: 'ok', result: updateResult};
     }
+
 
 
 }
