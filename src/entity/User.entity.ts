@@ -13,6 +13,8 @@ export class User {
     nom: string;
     @Column()
     prenom: string;
+    @Column()
+    age: number;
 
     @OneToMany(()=>Todo,(todo)=>todo.user)
     @JoinColumn()

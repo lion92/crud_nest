@@ -5,7 +5,7 @@ import {Repository} from "typeorm";
 import {User} from "../entity/User.entity";
 import * as bcrypt from 'bcrypt';
 import {LoginDTO} from "../dto/LoginDTO";
-import {Todo} from "../entity/todo.entity";
+import { Request, Response, Application } from 'express';
 
 @Injectable()
 export class ConnectionService {
@@ -20,16 +20,18 @@ export class ConnectionService {
     }
 
 
-    async signup(user: UserDTO) {
+    async signup(user: UserDTO, response:Response) {
         const userCreate = user;
         const saltOrRounds = 10;
         const password = userCreate.password;
         const hash = await bcrypt.hash(password, saltOrRounds);
         userCreate.password = hash
         await this.userRepository.save(userCreate);
+        response.cookie('testApp',userCreate.id,{httpOnly: true, domain: 'http://localhost:3001'})
     }
 
-    async login(user: LoginDTO): Promise<{ id: number, email: string, prenom: string, nom: string }> {
+    async login(user: LoginDTO, request:Request): Promise<string|{ id: number; email: string; nom: string; prenom: string; }> {
+
         const {password, email} = user;
         const userFind = await this.userRepository.findOneBy({email: email})
         if (!userFind) {
@@ -47,7 +49,6 @@ export class ConnectionService {
                 };
             }
         }
-
 
     }
 }
